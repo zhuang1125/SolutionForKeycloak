@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+
+    {
+      "library": "bootstrap-table@1.17.1",
+      "destination": "app/static/app/scripts/bootstrap-table/"
+    }
+  ,
+{
+  "library": "jquery@3.5.1",
+  "destination": "hello/scripts/",
+  "files": [
+    "jquery.min.js",
+    "jquery.js"
+  ]
+}
+,
+{
+  "library": "bootstrap-table@1.17.1",
+  "destination": "hello/scripts/",
+  "files": [
+    "bootstrap-table.min.js",
+    "locale/bootstrap-table-zh-CN.js",
+    "locale/bootstrap-table-zh-CN.min.js",
+    "bootstrap-table.js",
+    "bootstrap-table.min.css",
+    "bootstrap-table.css"
+  ]
+}
+]
+}

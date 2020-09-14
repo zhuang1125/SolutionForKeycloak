@@ -1,0 +1,217 @@
+﻿{% extends "app/layout.html" %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="panel panel-info" style="height:300px">
+            <div class="panel-heading">
+                <h3 class="panel-title">类别</h3>
+            </div>
+            <div class="panel-body">
+                <div class="list-op" id="list_op">
+                    <button type="button" class="btn btn-default btn-sm" id="btbtn_category_add">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" id="btbtn_category_edit">
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" id="btbtn_category_delete">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+                    </button>
+                </div>
+                <table id="bttable_category">
+                </table>
+            </div>
+            <script>
+
+    var categorys = {{ json_categorys | safe }};
+    $bttable_category = $("#bttable_category")
+    $bttable_category.bootstrapTable({
+        clickToSelect: true,
+        checkboxHeader: false,
+        singleSelect: true,
+        columns: [{
+            checkbox: true
+        }, {
+            field: 'category_id',
+            title: 'ID'
+        }, {
+            field: 'category_name',
+            title: '类别名'
+        }
+        ],
+        data: categorys
+    })
+                $bttable_category.bootstrapTable('hideLoading');
+
+                $btbtn_category_add = $("#btbtn_category_add")
+                $btbtn_category_add.click(function () {
+
+                        let urlEdit = "{% url 'category_add'  %}"
+                        self.location = urlEdit;
+
+
+                });
+
+
+
+
+                $btbtn_category_delete = $("#btbtn_category_delete")
+                $btbtn_category_delete.click(function () {
+                    let category = JSON.stringify($bttable_category.bootstrapTable('getSelections'));
+                    let json = JSON.parse(category);
+                    if (json.length == 0) {
+                        $('#myModal').modal('show');
+                    }
+                    else {
+                        let url = "{% url 'category_delete' category_id=0 %}"
+                        let category_id = json[0].category_id;
+                        url = url.replace('0', category_id);
+                        console.log(url)
+                        $.ajax({
+                            url: url, //请求的url地址
+                            dataType: "json", //返回格式为json
+                            async: true,//请求是否异步，默认为异步，这也是ajax重要特性
+                            //data: { "category_id": category_id }, //参数值
+                            type: "GET", //请求方式
+                            beforeSend: function () {
+                                //请求前的处理
+                            },
+                            success: function (req) {
+                                //请求成功时处理
+                                alert(req.message);
+                                var ids = $.map($bttable_category.bootstrapTable('getSelections'), function (row) {
+                                    return row.category_id
+                                })
+                                $bttable_category.bootstrapTable('remove', {
+                                    field: 'category_id',
+                                    values: ids
+                                })
+                            },
+                            complete: function () {
+                                //请求完成的处理
+                            },
+                            error: function (req) {
+                                //请求出错处理
+                                console.log(req);
+                            }
+                        });
+                    }
+                });
+
+                $btbtn_category_edit = $("#btbtn_category_edit")
+                $btbtn_category_edit.click(function () {
+                    let category = JSON.stringify($bttable_category.bootstrapTable('getSelections'));
+                    let json = JSON.parse(category);
+                    if (json.length == 0) {
+                        $('#myModal').modal('show');
+                    }
+                    else {
+                        let urlEdit = "{% url 'category_edit' category_id=0 %}"
+                        let category_id = json[0].category_id;
+                        urlEdit = urlEdit.replace('0', category_id);
+                        self.location = urlEdit;
+                    }
+
+                });
+
+
+
+            </script>
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="panel panel-info"  style="height:300px">
+            <div class="panel-heading">
+                <h3 class="panel-title">类别</h3>
+            </div>
+            <div class="panel-body">
+                <div class="list-op" id="list_op">
+                    <button type="button" class="btn btn-default btn-sm" id="dgbtn_category_add">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" id="dgbtn_category_edit">
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-message="[删除]未选中任何行" id="dgbtn_category_delete">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+                    </button>
+                </div>
+                <table class="table table-hover table-bordered" id="dgtable_category">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th>ID</th>
+                            <th>类别名</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if categorys %} {% for category in categorys %}
+                        <tr>
+                            <td><input data-id="{{ category.category_id}}" type="checkbox" /></td>
+                            <td>{{category.category_id}}</td>
+                            <td>{{category.category_name}}</td>
+                        </tr>
+                        {% endfor %} {% else %}
+                        <tr>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <script>
+                    $dgtable_category = $("#dgtable_category")
+                    $dgtable_category.on('click', 'tr', singleSelect);
+
+                    function singleSelect(e) {
+                        let inputChild = $(this).find('input');//获取该行input元素
+                        let checkBoxs = $(this).parents('.table').find('input');//获取table中所有的input元素
+                        if (inputChild[0].checked) {//如果该行本来为选中状态 则置为非选中状态
+                            checkBoxs.prop('checked', false);
+                        } else {//如果该行为非选中状态
+                            checkBoxs.prop('checked', false);//先将table中所有的checkbox置为非选中状态
+                            inputChild.prop('checked', true);//然后将该行置为选中状态
+                        }
+
+                        var target = e.target;//如果点击的是checkbox而不是tr 那么需要单独处理
+                        if (target.type == "checkbox") {
+                            inputChild.prop('checked', !inputChild[0].checked);
+                        }
+                    }
+                </script>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-6">
+    </div>
+    <div class="col-md-6">
+
+        <div class="panel panel-info"  style="height:300px">
+            <div class="panel-heading">
+                <h3 class="panel-title">Test</h3>
+            </div>
+            <div class="panel-body">
+                <table data-toggle="table"
+                       data-single-select="true"
+                       data-click-to-select="true"
+                       data-checkbox-header="false"
+                       data-url="{% url 'testjson2' %}">
+                    <thead>
+                        <tr>
+                            <th data-field="state" data-checkbox="true"></th>
+                            <th data-field="name">姓名</th>
+                            <th data-field="sex">性别</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+    {% endblock %}

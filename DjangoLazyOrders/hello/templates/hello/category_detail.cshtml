@@ -1,0 +1,52 @@
+﻿{% extends "app/layout.html" %}
+
+{% block content %}
+
+<form action="{% url 'category_edit' category_id %}" method="post" id='fm'>
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form }}
+    </div>
+    <button type="button" class="btn btn-default" id="btn_category_edit">Submit</button>
+
+    <script>
+
+        $btn_category_edit = $("#btn_category_edit")
+        $btn_category_edit.click(function () {
+            let url = "{% url 'category_edit' category_id %}"
+                console.log(url)
+                $.ajax({
+                    url: url, //请求的url地址
+                    dataType: "json", //返回格式为json
+                    async: true,//请求是否异步，默认为异步，这也是ajax重要特性
+                    //data: { "category_id": category_id }, //参数值
+                    data: $('#fm').serialize(),
+                    type: "POST", //请求方式
+                    beforeSend: function () {
+                        //请求前的处理
+                    },
+                    success: function (req) {
+                        //请求成功时处理
+                        alert(req.message);
+
+                        if (req.message == 'ok') {
+                            let urlEdit = "{% url 'lazy_orders_index' %}"
+                            self.location = urlEdit;
+                        }
+
+                    },
+                    complete: function () {
+                        //请求完成的处理
+                    },
+                    error: function (req) {
+                        //请求出错处理
+                        console.log(req);
+                    }
+                });
+
+        });
+
+    </script>
+</form>
+
+ {% endblock %}
