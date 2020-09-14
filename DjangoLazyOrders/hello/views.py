@@ -19,6 +19,7 @@ def testjson(request):
     'name': 'dengwei',
     'sex': '男'
     }
+
     return HttpResponse(json.dumps(data),content_type="application/json")
 
 def testjson2(request):
